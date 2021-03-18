@@ -1,0 +1,70 @@
+<html>
+<head>
+  <title style="text-align: center">Have fun urbexing!</title>
+  <link rel="stylesheet" href="https://d19vzq90twjlae.cloudfront.net/leaflet-0.7.3/leaflet.css" />
+  <script src="https://d19vzq90twjlae.cloudfront.net/leaflet-0.7.3/leaflet.js"></script>
+  <style>
+    #map{ width:100%; height: 75%; }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center">Select a location and scroll down for more information.</h1>
+  <div style="width:49%; float: left;" id="map"></div>
+  <div style="width:49%; float: right;" id="content">
+    <h1 id="name"></h1>
+    <p id="description"></p>
+  </div>
+
+  <div style="clear:both;" id="imageview"></div>
+
+  <script>
+  // initialize the map
+  var map = L.map('map').setView([50.3966675, 4.4906659], 7);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  </script>
+
+  <script type="text/javascript">
+
+  function Get(yourUrl){
+    var Httpreq = new XMLHttpRequest(); // a new request
+    Httpreq.open("GET",yourUrl,false);
+    Httpreq.send(null);
+    return Httpreq.responseText;
+  }
+
+  var locationData = {{ data|safe }}
+    for (var i = 0; i < locationData.length; i++) {
+      window.setTimeout(pinLocations, 1000, locationData[i][0], locationData[i][1], locationData[i][2], locationData[i][3], locationData[i][4])
+    }
+    function pinLocations(lat, lon, name, description, location_id) {
+      var marker = L.marker([lat, lon], { title: 'unselected' }).addTo(map);
+
+      marker.on('click', function(e) {
+          document.getElementById("name").textContent=name;
+          document.getElementById("description").textContent=description;
+
+          //remove previous images
+          var images = document.getElementsByClassName('images');
+          var l = images.length;
+          for (var i = 0; i < l; i++) {
+              images[0].parentNode.removeChild(images[0]);
+          }
+
+          var json_obj = JSON.parse(Get(`location/images/${location_id}`));
+          var images = json_obj.images;
+
+          for (var i = 0; i < images.length; i++) {
+            var img = document.createElement('img');
+            img.classList.add("images");
+            img.src = `location/images/${location_id}/${images[i]}`;
+            img.style = 'width:33%';
+            document.getElementById('imageview').appendChild(img);
+          }
+       });
+    }
+   </script>
+</body>
+</html>
