@@ -7,4 +7,4 @@ pip install -r requirements.txt
 ```
 python server.py
 ```
-**Once the server is running, open http://127.0.0.1:5000/index to start exploring new places**
+**Once the server is running, open http://127.0.0.1:5000/ to start exploring new places**
